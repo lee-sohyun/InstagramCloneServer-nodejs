@@ -1,0 +1,43 @@
+{
+  "name": "IntagramCloneServer",
+  "description": "Instagram Clone Server",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "lint": "./node_modules/eslint/bin/eslint.js",
+    "test": "jest",
+    "start": "node ./app.js"
+  },
+  "author": "lee-sohyun",
+  "dependencies": {
+    "acorn": "7.3.1",
+    "bcrypt": "5.0.0",
+    "body-parser": "1.18.3",
+    "cors": "2.8.5",
+    "debug": "2.6.9",
+    "express": "4.17.1",
+    "iconv-lite": "0.5.0",
+    "ioredis": "4.16.0",
+    "jschardet": "2.1.0",
+    "jsonwebtoken": "8.5.1",
+    "md5": "2.2.1",
+    "md5-hex": "3.0.0",
+    "multer": "1.4.2",
+    "mysql2": "1.6.4",
+    "node-gcm": "1.0.2",
+    "randomstring": "1.1.5",
+    "redis": "2.8.0",
+    "request-promise-native": "1.0.8",
+    "sequelize": "6.2.3",
+    "swagger-ui": "3.28.0"
+  },
+  "devDependencies": {
+    "concurrently": "3.6.0",
+    "eslint": "5.4.0",
+    "eslint-config-airbnb-base": "13.1.0",
+    "eslint-plugin-import": "2.14.0",
+    "eslint-plugin-node": "7.0.1",
+    "eslint-plugin-security": "1.4.0",
+    "jest": "24.9.0"
+  }
+}

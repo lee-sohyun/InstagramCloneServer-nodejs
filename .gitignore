@@ -1,0 +1,33 @@
+.DS_Store
+.deploy/
+out/
+temp/
+components/
+node_modules/
+test/scripts/*.js
+*.csv
+# IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Log files
+logs/
+*.heapsnapshot
+
+.nodemonignore
+**.*~
+
+# Elastic Beanstalk Files
+.elasticbeanstalk
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+package-lock.json
+
+# Eclipse
+.project
+.settings/*
+
+# vscode
+.vscode/

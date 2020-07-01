@@ -15,6 +15,5 @@ npm install
 ```
 npm start
 ```
-
 ### Relation
-[InstagramCloneAndroid](https://github.com/minwookH/InstagramCloneAndroid)
+[InstagramCloneAndroid](https://github.com/minwookH/InstagramCloneAndroid) by @minwookH

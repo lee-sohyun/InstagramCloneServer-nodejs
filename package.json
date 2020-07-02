@@ -28,7 +28,7 @@
     "randomstring": "1.1.5",
     "redis": "2.8.0",
     "request-promise-native": "1.0.8",
-    "sequelize": "6.2.3",
+    "sequelize": "5.22.3",
     "swagger-ui": "3.28.0"
   },
   "devDependencies": {

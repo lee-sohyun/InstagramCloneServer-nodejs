@@ -6,6 +6,7 @@ const { auth } = require('../auth');
 const post = require('../api/post');
 
 router.use(auth);
-router.get('/', post.getPostByPostId);
+router.get('/', post.getPostList);
+router.get('/:feedId', post.getPostByFeedId);
 
 module.exports = router;

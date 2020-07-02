@@ -15,5 +15,25 @@ npm install
 ```
 npm start
 ```
+### APIs
+#### User Route
+login `[POST] /api/user`
+```
+{
+  userId,
+  password
+}
+```
+**Description**: Server will return a JWT token as:
+```
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QiLCJpYXQiOjE1OTM1MDYyODcsImV4cCI6MTU5MzU5MjY4N30.5z9f7UKvJEsHR1dY2bvQv8p9Nydf_zefPWgpSqsDGWM"
+}
+```
+이후에는 서버 호출 시, Authorization에 `Bearer${token}` 형태로 담아서 전달한다.  
+#### Post Route
+getList `[GET] /api/post`  
+getPostByFeedId `[GET] /api/post/:feedId`  
+
 ### Relation
 [InstagramCloneAndroid](https://github.com/minwookH/InstagramCloneAndroid) by @minwookH

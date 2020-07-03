@@ -1,6 +1,6 @@
 'use strict';
 
-const PostMDB = require('../database/mysql/post');
+const FeedMDB = require('../database/mysql/feed');
 
 const feedExample = [
   {
@@ -41,14 +41,14 @@ const feedExample = [
   }
 ];
 
-exports.getPostList = async function getPostList() {
-  const result = await PostMDB.query();
-  // DB 미연결 시, const result = postExample;
+exports.getFeedList = async function getFeedList() {
+  const result = await FeedMDB.query();
+  // DB 미연결 시, const result = feedExample;
   return result;
 };
 
-exports.getPostByFeedId = async function getPostByFeedId(feedId) {
-  const result = await PostMDB.get({ where: { feedId } });
+exports.getFeedByFeedId = async function getFeedByFeedId(feedId) {
+  const result = await FeedMDB.get({ where: { feedId } });
   /* DB 미연결 시,
     const index = feedExample.findIndex(feed => feed.feedId === Number(feedId));
     const result = feedExample[index];

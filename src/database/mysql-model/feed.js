@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = (sequelize, DataTypes) => sequelize.define(
-  'post',
+  'feed',
   {
     feedId: {
       type: DataTypes.INTEGER(11),
@@ -46,7 +46,7 @@ module.exports = (sequelize, DataTypes) => sequelize.define(
     },
   },
   {
-    tableName: 'post',
+    tableName: 'feed',
     timestamps: false,
   },
 );

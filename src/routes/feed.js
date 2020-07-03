@@ -3,10 +3,10 @@
 const router = require('express').Router();
 
 const { auth } = require('../auth');
-const post = require('../api/post');
+const feed = require('../api/feed');
 
 router.use(auth);
-router.get('/', post.getPostList);
-router.get('/:feedId', post.getPostByFeedId);
+router.get('/', feed.getFeedList);
+router.get('/:feedId', feed.getFeedByFeedId);
 
 module.exports = router;

@@ -1,141 +1,164 @@
 'use strict';
 
+const _ = require('lodash');
 const { sequelize } = require('../mysql-model');
 
 const buildOptions = ({
   where,
   attributes,
-  length,
   transaction,
   order,
   offset,
+  limit,
+  include,
 }) => {
   const options = { where };
 
-  if (transaction) {
-    options.transaction = transaction;
-  }
-
-  if (length && length > 1) {
-    options.limit = length;
-  }
-
-  if (attributes && attributes.length) {
-    options.attributes = attributes;
-  }
-
-  if (order && order.length) {
-    options.order = order;
-  }
-
-  if (offset && order.offset) {
-    options.offset = offset;
-  }
+  if (transaction) options.transaction = transaction;
+  if (attributes && !_.isEmpty(attributes)) options.attributes = attributes;
+  if (order && order.length) options.order = order;
+  if (offset) options.offset = offset;
+  if (limit && limit > 1) options.limit = limit;
+  if (include && include.length) options.include = include;
 
   return options;
 };
 
 const queryFunc = async (params) => {
   const options = buildOptions(params);
-  const { model, length } = params;
+  const { array, model, limit } = params;
 
-  if (length === 1) {
+  if (limit === 1) {
     const data = await model.findOne(options);
-    return data ? data.dataValues : undefined;
+    if (data) {
+      return array ? [data.dataValues] : data.dataValues;
+    }
+    return;
   }
 
-  const data = await model.findAll(options);
-  if (!data) return [];
+  try {
+    const data = await model.findAll(options);
+    if (!data) return [];
 
-  return data.map(l => l.dataValues);
+    return data.map((l) => l.dataValues);
+  } catch (err) {
+    return Promise.reject(err);
+  }
 };
 
 const updateFunc = async ({
-  model, where, value, transaction,
+  model,
+  where,
+  value,
+  limit,
+  transaction,
+  check = true,
 }) => {
   const options = { where };
-  if (transaction) options.transaction = transaction;
 
-  const count = await model.update(value, { where, transaction });
+  if (transaction) {
+    transaction.canRollback = true;
+    options.transaction = transaction;
+  }
+  if (limit) options.limit = limit;
 
-  if (count.length && count[0] === 0) throw new Error();
-};
+  try {
+    const count = await model.update(value, options);
 
-const updateFuncWithoutcheck = async ({
-  model, where, value, transaction,
-}) => {
-  const options = { where };
-  if (transaction) options.transaction = transaction;
-
-  const count = await model.update(value, { where, transaction });
-
+    if (check && count.length && count[0] === 0) throw new Error();
+  } catch (err) {
+    return Promise.reject(err);
+  }
 };
 
 module.exports = (model) => ({
   query: async (params) => {
-    if (!params) params = {};
-    const {
-      where, attributes, length, transaction, order, offset,
-    } = params;
+    params = { ...(params || {}), model, array: true };
 
-    return queryFunc({
-      model,
-      where,
-      attributes,
-      length,
-      transaction,
-      order,
-      offset,
-    });
+    return queryFunc(params);
   },
 
-  get: async ({ where, attributes, transaction }) => queryFunc({
-    model,
-    where,
-    attributes,
-    length: 1,
-    transaction,
-  }),
+  get: async (params) => {
+    params = { ...(params || {}), model, limit: 1 };
 
-  count: async (where, transaction) => {
-    if (transaction) return model.count(where, transaction);
-    return model.count(where);
+    return queryFunc(params);
+  },
+
+  count: async (params) => {
+    try {
+      return model.count(params);
+    } catch (err) {
+      return Promise.reject(err);
+    }
   },
 
   put: async (item, transaction) => {
-    if (transaction) return model.create(item, { transaction });
-    return model.create(item);
+    try {
+      if (transaction) {
+        transaction.canRollback = true;
+        return await model.create(item, { transaction });
+      }
+      return await model.create(item);
+    } catch (err) {
+      return Promise.reject(err);
+    }
   },
 
   puts: async (items, transaction) => {
-    if (transaction) return model.bulkCreate(items, { transaction });
-    return model.bulkCreate(items);
+    try {
+      if (transaction) {
+        transaction.canRollback = true;
+        return await model.bulkCreate(items, { transaction });
+      }
+      return await model.bulkCreate(items);
+    } catch (err) {
+      return Promise.reject(err);
+    }
   },
 
-  update: async ({ where, value, transaction }) => updateFunc({
-    model, where, value, transaction,
-  }),
+  update: async (params) => {
+    params = { ...(params || {}), model };
 
-  updateWithoutCheck: async ({ where, value, transaction }) => updateFuncWithoutcheck({
-    model, where, value, transaction,
-  }),
+    return updateFunc(params);
+  },
 
-  increase: async ({ where, params, transaction }) => {
-    const value = {};
+  increase: async (params) => {
+    const { value } = params;
 
-    Object.keys(params).forEach((k) => {
-      value[k] = sequelize.literal(`\`${k}\` + ${params[k]}`);
+    if (!value || typeof (value) !== 'object' || Array.isArray(value)) {
+      return Promise.reject(err);
+    }
+
+    Object.entries(value).forEach(([k, v]) => {
+      value[k] = sequelize.literal(`\`${k}\` + ${v}`);
     });
 
-    return updateFunc({
-      model, where, value, transaction,
-    });
+    params = { ...params, model };
+
+    return updateFunc(params);
   },
 
-  delete: async (where, transaction) => {
-    if (transaction) return model.destroy({ where, transaction });
-    return model.destroy({ where });
+  delete: async ({
+    where,
+    limit,
+    transaction,
+  }) => {
+    try {
+      if (transaction) {
+        transaction.canRollback = true;
+        return await model.destroy({ where, limit, transaction });
+      }
+      return await model.destroy({ where, limit });
+    } catch (err) {
+      return Promise.reject(err);
+    }
   },
 
-  truncate: async () => model.truncate(),
+  truncate: async () => {
+    try {
+      return await model.truncate();
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  },
 });

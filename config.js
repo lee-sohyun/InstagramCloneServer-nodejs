@@ -18,7 +18,7 @@ const config = {
       acquire: 100000,
       evict: 100000,
     },
-    operatorsAliases: false,
+    operatorsAliases: 0,
     define: {
       charset: 'utf8mb4',
       dialectOptions: {

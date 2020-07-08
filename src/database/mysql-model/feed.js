@@ -24,21 +24,9 @@ module.exports = (sequelize, DataTypes) => sequelize.define(
       type: DataTypes.STRING(128),
       allowNull: true,
     },
-    feedContents: {
-      type: DataTypes.STRING(256),
-      allowNull: true,
-    },
     likeCount: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
-    },
-    isScrap: {
-      type: DataTypes.BOOLEAN,
-      allowNull: true,
-    },
-    isLike: {
-      type: DataTypes.BOOLEAN,
-      allowNull: true,
     },
     date: {
       type: DataTypes.STRING(45),
@@ -48,5 +36,9 @@ module.exports = (sequelize, DataTypes) => sequelize.define(
   {
     tableName: 'feed',
     timestamps: false,
+  },
+  (models) => {
+    models.feed.hasMany(models.feedContents, { as: 'feedContents', foreignKey: 'feedId', targetKey: 'feedId' });
+    models.feed.hasOne(models.feedLike, { as: 'feedLike', foreignKey: 'feedId', targetKey: 'feedId' });
   },
 );

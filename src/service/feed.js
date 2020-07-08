@@ -1,6 +1,7 @@
 'use strict';
 
 const FeedMDB = require('../database/mysql/feed');
+const { feedContents, feedLike } = require('../database/mysql-model');
 
 const feedExample = [
   {
@@ -42,13 +43,76 @@ const feedExample = [
 ];
 
 exports.getFeedList = async function getFeedList() {
-  const result = await FeedMDB.query();
+  const result = await FeedMDB.query({
+    order: [
+      ['FeedId', 'DESC'],
+    ],
+    include: [
+      {
+        model: feedContents,
+        as: 'feedContents',
+        attributes: ['feedContent'],
+        required:false,
+      },
+      {
+        model: feedLike,
+        as: 'feedLike',
+        attributes: ['isLike'],
+        required:false,
+      },
+    ],
+  });
+
+  for (let i = 0; i < result.length; i += 1) {
+    const contentList = [];
+    for (let element of result[i].feedContents) {
+      element = JSON.parse(element.feedContent);
+      contentList.push(element);
+    }
+    result[i].feedContents = contentList;
+    result[i].isLike = !!result[i].feedLike;
+    result[i].isScrap = !!result[i].feedScrap;
+
+    delete result[i].feedLike;
+    delete result[i].feedScrap;
+  }
   // DB 미연결 시, const result = feedExample;
   return result;
 };
 
 exports.getFeedByFeedId = async function getFeedByFeedId(feedId) {
-  const result = await FeedMDB.get({ where: { feedId } });
+  const result = await FeedMDB.get({
+    where: { feedId },
+    include: [
+      {
+        model: feedContents,
+        as: 'feedContents',
+        where: { feedId: Number(feedId) },
+        attributes: ['feedContent'],
+        required:false,
+      },
+      {
+        model: feedLike,
+        as: 'feedLike',
+        where: { feedId: Number(feedId) },
+        attributes: ['isLike'],
+        required:false,
+      },
+    ],
+  });
+
+  const list = [];
+  for (let element of result.feedContents) {
+    element = JSON.parse(element.feedContent);
+    list.push(element);
+  }
+  result.feedContents = list;
+  result.isLike = !!result.feedLike;
+  result.isScrap = !!result.feedScrap;
+
+  delete result.feedLike;
+  delete result.feedScrap;
+
   /* DB 미연결 시,
     const index = feedExample.findIndex(feed => feed.feedId === Number(feedId));
     const result = feedExample[index];

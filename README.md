@@ -5,7 +5,7 @@ Node.js를 사용하는 Instagram Clone Coding 프로젝트입니다
 ### Getting Started
 1. Clone this repository
 ```
-git clone https://github.com/lee-sohyun/InstagramCloneServer.git
+git clone https://github.com/lee-sohyun/InstagramCloneServer-nodejs.git
 ````
 2. Install dependencies
 ```
